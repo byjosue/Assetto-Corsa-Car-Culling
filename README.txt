@@ -1,81 +1,85 @@
-CAR CULLING 1.5.1
-=================
+# Car Culling
 
-Install
-  1. Delete the old CarCulling folder from  assettocorsa\apps\lua\  and copy the new one in, so you end up with
-     assettocorsa\apps\lua\CarCulling\CarCulling.lua  (manifest.ini changed too, so copy all three files).
-  2. Restart the game (not just the session) and join an online server, or a race against bots. The app starts by itself
-     with the game and keeps running with its window closed. To change the settings or see the counters, open "Car Culling" from the in-game
-     app list.
+An Assetto Corsa app (a [Custom Shaders Patch](https://acstuff.club/patch/) Lua app) that stops drawing the cars you can't see or don't need, so your PC has less to render in big online races.
 
-What it does
-  - Hide cars nobody is driving: the cars of free slots, parked in the pit lane, are not drawn.
-    A car is drawn again as soon as a driver joins its slot or the car starts moving.
-  - Only draw the nearest cars: optional, draws only the nearest N cars (measured from the camera)
-    plus every car within the chosen distance. Your own car and the car you are watching are always drawn.
-  - Against bots the nearest-cars option works the same way. Bots count as drivers, so "Hide cars nobody is driving"
-    leaves them alone (it only hides the empty slots of an online server). Tune the distance and the number of cars there.
-  - Only the 3D models are hidden. Physics, collisions and the network are not touched, so
-    a hidden car can still be hit.
+<p align="center">
+  <img src="car_culling_options.png" alt="The Car Culling window with every option numbered and explained" width="720">
+</p>
 
-Only draw the nearest cars (all the settings are in the window)
-  - Draw the nearest N cars, plus every car within a distance. Other cars are hidden.
-  - Measure the distance: "Straight line" (as the crow flies, the default), or "Along the track" (the distance
-    you would have to drive). Along the track, a car on the other side of a hairpin counts as far away even if it
-    is close in a straight line, because you are much less likely to see it. A car less than 20 m away in a straight
-    line is never hidden because of that.
-  - "Straight line when off the track or in the pits" (on by default): along the track, the app switches to a
-    straight line by itself while you have 3 or more wheels off the track, and for about 2 seconds after, and while
-    you are in the pit lane. A straight line is also used when the camera is far from the car (replays, free
-    camera) or the track gives no distance information. The window says which one is in use ("Distance: ...").
-  - "Different limits in front of and behind me": the numbers and the distances can be set separately for the cars
-    in front of and the cars behind the car you are watching (a car is in front when it is ahead of that car's nose,
-    seen from above). A car has to be 5 m into the other half before it changes sides, so cars driving side by
-    side do not pop in and out. This only applies with more than the chosen number of other cars (cars nobody
-    drives are not counted); with fewer, the two normal sliders are used. With this option on, the window shows
-    the normal sliders under "With N other cars or fewer:", and does not show them when N is 0 (they would do
-    nothing then). With the option off, the sliders for the front and the back are not shown.
-  - The window shows how many cars were hidden in front and behind.
+<sub>The picture is an illustration of the app window (same labels, same order), not an in-game screenshot.</sub>
 
-How cars are hidden (choose in the window, the first one is the default)
-  1. The car and every part of it: switches off the car and every mesh of it. This is the "Stronger hiding" of the
-     earlier versions, now the normal way, because online switching off the car as a whole was not enough.
-  2. The car as a whole only: the lightest way, but online the game switches the car on again before it is drawn,
-     so the cars only flicker.
-  3. Switch unoccupied cars off: unoccupied cars are switched off with ac.setCarActive; cars hidden for being far away
-     use way 1. Try this if way 1 still leaves cars drawn or cars do not come back.
+## Why
 
-Getting the cars back
-  - Untick "Active": every car is drawn again. Closing the window does NOT stop the app, only unticking "Active" does.
-  - "Stop and draw every car" (bottom of the window): unticks "Active" and tries again for cars that did not come back.
-  - If a car does not come back, press "Copy report" and send the text (paste it into the chat). The window also turns red
-    when a car could not be put back completely.
+Online servers make the game draw every car slot, including the ones nobody is driving. In a full-grid race the game also draws dozens of cars you will never look at. Car Culling hides both, and only the 3D models: physics, collisions and the network are not touched, so a hidden car can still be hit.
 
-What changed in 1.5.1
-  The window only shows the sliders that do something: the front/back sliders only with the front/back option on,
-  and the normal sliders (with a heading) only when they still apply.
+## Features
 
-What changed in 1.5
-  Separate limits for the cars in front and behind, the "only with more than N cars" setting, distance along the
-  track with the automatic switch to a straight line off the track and in the pits.
-  This was tested against a simulated game only. Tell me if cars pop in more than before, and which settings you used
-  (the "Copy report" text includes the distance mode, the front/back state and the hidden counts).
+- **Hide cars nobody is driving.** Empty slots are not drawn (optionally only while they are parked in the pit lane). A car is drawn again as soon as a driver joins its slot or it starts moving.
+- **Only draw the nearest cars.** Draw the nearest N cars plus every car inside an "always draw" distance, and hide the rest. Your own car and the car you are watching are always drawn.
+- **Two ways to measure distance.**
+  - *Straight line*: as the crow flies.
+  - *Along the track*: the distance you would have to drive. A car on the far side of a hairpin counts as far away even if it is close in a straight line, because you are much less likely to see it. A car less than 20 m away is never hidden because of this.
+- **No pop-in off the track.** With *Straight line when off the track or in the pits* on, the app switches to straight-line distance by itself while you are off the track (3 or more wheels, plus about 2 seconds after) or in the pit lane, and when the camera is far from the car (replays, free camera).
+- **Separate limits in front of and behind you.** Draw more cars ahead, where you look, and fewer behind, where you only see them in the mirror. This only applies above a number of other cars you choose; below it, the normal limits are used. Cars have to move 5 m into the other half before they change sides, so cars side by side don't flicker in and out.
+- **Works in races against bots too**, so you can tune the settings offline. Bots count as drivers, so *Hide cars nobody is driving* leaves them alone (it only hides the empty slots of an online server).
+- **Live status** in the window: cars in the session, hidden as empty, hidden as far away (in front and behind), which distance measure is in use, and whether the front/back limits are active.
 
-What changed in 1.4.1
-  The app now also loads in offline sessions (races against bots); before, it switched itself off there.
+## Install
 
-What changed in 1.4
-  Versions 1.1 to 1.3 had two problems: hiding the car as a whole did not work online (cars flickered), and hiding every
-  part of the car worked but the cars never came back. In 1.4 the parts of a car are looked up once, before the car
-  is hidden for the first time, together with which of them were visible. The same references are used to put them
-  back (a new search made while the car is hidden may not find the hidden parts), each part gets its own state back,
-  and the result is checked afterwards, with a second way of putting them back if the first does not work.
-  The car as a whole is switched on again from the UI callback (the moment the "Car Culling Lab" buttons ran in)
-  and kept on for about 30 frames.
-  This was tested against a simulated game, not yet in the real game. The "Copy report" text tells me how many parts
-  a car has, how many a new search finds while it is hidden, and whether they all came back.
+1. Copy the `CarCulling` folder into your Assetto Corsa install, so you end up with:
 
-Remove
-  Delete the CarCulling folder. (Or untick "Active" in its window: every car is drawn again at once.)
+   ```
+   assettocorsa\apps\lua\CarCulling\CarCulling.lua
+   assettocorsa\apps\lua\CarCulling\manifest.ini
+   assettocorsa\apps\lua\CarCulling\icon.png
+   ```
 
-graphics_adjustments_snippet.ini holds the built-in CSP options, with where to put them.
+   (When updating, delete the old `CarCulling` folder first and copy all three files, since the manifest changes between versions.)
+
+2. Restart the game (not just the session) and join an online server or a race against bots.
+3. The app starts by itself with the game and keeps running with its window closed. To change settings or see the counters, open **Car Culling** from the in-game app list.
+
+**Requires** Assetto Corsa with a recent version of Custom Shaders Patch (the app uses CSP's Lua scene API).
+
+## Options explained
+
+The numbers match the picture above.
+
+| # | Option | What it does |
+|---|--------|--------------|
+| 1 | **Active** | Master switch. Untick it and every car is drawn again. |
+| 2 | **Hide cars nobody is driving** | Hides the empty slots. *Only while parked in the pit lane* limits it to cars sitting parked in the pits. |
+| 3 | **How cars are hidden** | *The car and every part of it* (default, the one that works online), *The car as a whole only* (lightest, but online the game may switch the car on again before it is drawn, so it can flicker), *Switch unoccupied cars off* (uses `ac.setCarActive` for empty slots; far cars still use the first way). Try the third if the first leaves cars drawn or cars don't come back. |
+| 4 | **Only draw the nearest cars** | Turns the distance limit on. Cars inside the "always draw" distance are never hidden. |
+| 5 | **Measure the distance** | *Straight line* or *Along the track* (see above). |
+| 6 | **Straight line when off the track or in the pits** | Automatic fallback to straight-line distance, only used with *Along the track*. |
+| 7 | **Different limits in front of and behind me** | Separate "draw the nearest N cars" and "always draw within X m" for the front and the back, and *Only with more than N other cars* to set when this takes over. A car is "in front" when it is ahead of the nose of the car you are watching, seen from above. |
+| 8 | **Normal limits** | The plain "draw the nearest N cars" and "always draw within X m" sliders. With front/back on they cover smaller races (shown under "With N other cars or fewer"); with it off they apply everywhere. |
+| 9 | **Live status** | What is hidden and why, and which distance is in use right now. Handy for tuning against bots. |
+| 10 | **Stop and draw every car** / **Copy report** | The panic button, and a diagnostics report copied to the clipboard. |
+
+The window only shows the sliders that do something with your current settings.
+
+## Getting the cars back
+
+- Untick **Active**: every car is drawn again. Closing the window does **not** stop the app, only unticking *Active* does.
+- **Stop and draw every car** unticks *Active* and tries again for any car that did not come back. The window turns red if a car could not be put back completely.
+- To remove the app, delete the `CarCulling` folder.
+
+## Tuning tips
+
+- Start with the defaults, then open the window and watch the *Hidden, far away* counter while you adjust the sliders.
+- If you clip your mirror render distance, put the tighter limits on the **back**: cars you only see in the mirror pop in less noticeably than cars in front.
+- If cars pop in around you off the track, make sure *Straight line when off the track or in the pits* is on, or use *Straight line* for everything.
+
+## How it works
+
+Online, hiding the car's scene node alone only makes it flicker (the game appears to switch it back on), and hiding every mesh of the car works but needs a reliable way back. So the app looks up all the meshes of a car once, before it is first hidden, remembers which of them were visible, and holds on to those references. It hides the car again at several moments of each frame, and restores each mesh with its own state when the car should be drawn. The result is checked afterwards, with a second restore method if the first did not work.
+
+## Reporting problems
+
+Open an issue and paste the text from **Copy report**. It includes the version, hide method, distance mode, front/back state, hidden counts and whether every car came back, which is usually enough to see what went wrong. Please also say which settings you used and whether you were online or against bots.
+
+## Credits
+
+Built with [Claude](https://claude.ai) (Anthropic) and tested in Assetto Corsa online and against bots.
